@@ -1,5 +1,6 @@
 # Build stage
-FROM node:20-alpine AS builder
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION}-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -16,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM ghcr.io/quantcdn-templates/app-node:latest
+FROM ghcr.io/quantcdn-templates/app-node:${NODE_VERSION}
 
 # Set environment variables
 ENV NODE_ENV=production
