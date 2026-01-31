@@ -1,0 +1,14 @@
+# Local development overrides
+# Copy this file to docker-compose.override.yml and customize as needed
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev

@@ -1,0 +1,84 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+env:
+  RUNNER_TYPE: standard
+  BUILD_PLATFORM: linux/amd64
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Quant Cloud
+        id: quant-init
+        uses: quantcdn/quant-cloud-init-action@v1
+        with:
+          api_key: ${{ secrets.QUANT_API_KEY }}
+          organization: ${{ secrets.QUANT_ORGANIZATION }}
+          application: ${{ secrets.QUANT_APPLICATION }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Quant Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ steps.quant-init.outputs.registry }}
+          username: ${{ steps.quant-init.outputs.registry_username }}
+          password: ${{ steps.quant-init.outputs.registry_password }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.quant-init.outputs.registry }}/${{ steps.quant-init.outputs.image_name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: ${{ env.BUILD_PLATFORM }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Create or update environment
+        if: github.event_name == 'push'
+        uses: quantcdn/quant-cloud-environment-action@v1
+        with:
+          api_key: ${{ secrets.QUANT_API_KEY }}
+          organization: ${{ secrets.QUANT_ORGANIZATION }}
+          application: ${{ steps.quant-init.outputs.application }}
+          environment: ${{ github.ref_name }}
+          image: ${{ steps.quant-init.outputs.registry }}/${{ steps.quant-init.outputs.image_name }}:${{ github.ref_name }}
+
+      - name: Redeploy environment
+        if: github.event_name == 'push'
+        uses: quantcdn/quant-cloud-environment-state-action@v1
+        with:
+          api_key: ${{ secrets.QUANT_API_KEY }}
+          organization: ${{ secrets.QUANT_ORGANIZATION }}
+          application: ${{ steps.quant-init.outputs.application }}
+          environment: ${{ github.ref_name }}
+          state: redeploy
