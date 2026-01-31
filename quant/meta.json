@@ -1,5 +1,6 @@
 {
-  "title": "Remix",
+  "url": "/deploy/app/app-remix",
+    "title": "Remix",
   "description": "A full-stack web framework built on React with server-side rendering, nested routing, and data loading patterns.",
   "template_type": "app",
   "requires_db": false,

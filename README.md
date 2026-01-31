@@ -2,7 +2,7 @@
 
 A [Remix](https://remix.run) application template configured for deployment on [Quant Cloud](https://www.quantcdn.io).
 
-[![Deploy to Quant Cloud](https://www.quantcdn.io/img/quant-deploy-btn-sml.svg)](https://dashboard.quantcdn.io/cloud-apps/create/starter-kit/app-remix)
+[![Deploy to Quant Cloud](https://www.quantcdn.io/img/quant-deploy-btn-sml.svg)](https://dashboard.quantcdn.io/deploy/app/app-remix)
 
 ## Features
 
