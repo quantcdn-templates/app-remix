@@ -25,16 +25,6 @@ export default function Index() {
 
   return (
     <div style={styles.container}>
-      <style>{`
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-        }
-      `}</style>
-
       <main style={styles.main}>
         <div style={styles.card}>
           <div style={styles.logoContainer}>
